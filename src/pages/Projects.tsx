@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import useInView from "../hooks/useInView";
@@ -27,6 +27,17 @@ const projects = [
   },
 ];
 
+// Search bar style
+const SearchInput = styled.input`
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px;
+  font-size: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 5px;
+`;
+
 const Container = styled.div`
   padding: 50px 20px;
   text-align: center;
@@ -50,10 +61,12 @@ const Grid = styled(motion.div)`
 const ProjectCard = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
   padding: 20px;
-  border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid ${({ theme }) => theme.colors.primary};
   background-color: ${({ theme }) => theme.colors.background};
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
@@ -98,6 +111,14 @@ const Projects: React.FC = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, 0.2);
 
+  // State for search input
+  const [search, setSearch] = useState("");
+
+  // Filter projects based on search input
+  const filteredProjects = projects.filter((project) =>
+    project.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <Container id="projects" ref={ref}>
       <Title
@@ -107,6 +128,13 @@ const Projects: React.FC = () => {
       >
         My Projects
       </Title>
+      {/* Search bar added here */}
+      <SearchInput
+        type="text"
+        placeholder="Search Projects..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
       <Grid
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
@@ -119,7 +147,7 @@ const Projects: React.FC = () => {
           },
         }}
       >
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <ProjectCard
             key={project.id}
             variants={{
